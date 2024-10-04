@@ -167,6 +167,42 @@ router.put("/:id", (req, res) => {
     ) {
         return res.sendStatus(400);
     }
+
+    const id = Number(req.params.id);
+    const index = films.findIndex((film) => film.id === id);
+    if(index === -1) {
+        const { title, director, duration} = body as NewFilm;
+
+        const nextId = films.reduce((maxId, film) => (film.id > maxId ? film.id : maxId), 0) + 1;
+
+        const newFilm: Film = {
+           id: nextId,
+           title,
+           director,
+           duration
+        };
+        return res.json(newFilm);
+    } else {
+        const film = films.find((film) => film.id === id);
+        if(!film) {
+            return res.sendStatus(400);
+        }
+
+        const { title, director, duration} = body as Partial<NewFilm>;
+
+       if (title) {
+           film.title = title;
+        }
+       if(director) {
+           film.director = director;
+        }
+        if(duration) {
+           film.duration = duration;
+        }
+
+        return res.json(film);
+    }
+
 });
 
 export default router;
